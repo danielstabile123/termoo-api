@@ -74,7 +74,11 @@ Valida uma tentativa do jogador.
    - `APP_KEY` = opcional — o script `scripts/start.sh` gera automaticamente se estiver vazio
 3. Em **Settings** → confirme que o **Root Directory** está vazio (raiz do repo).
 4. Clique em **Redeploy** (ou faça um novo commit).
-5. Teste: `POST https://SUA-URL.up.railway.app/api/iniciar-jogo`
+5. Teste:
+   - `GET https://SUA-URL.up.railway.app/` → status da API
+   - `POST https://SUA-URL.up.railway.app/api/iniciar-jogo` → inicia partida
+
+> **Importante:** o front do Termoo usa as rotas `/api/...`. A URL base é só `https://SUA-URL.up.railway.app` (sem `/api` no final).
 
 Se o build falhar de novo, abra a aba **Build Logs** e verifique se `composer install` terminou sem erro.
 

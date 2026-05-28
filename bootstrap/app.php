@@ -10,9 +10,16 @@ return Application::configure(basePath: dirname(__DIR__))
         web: __DIR__ . '/../routes/web.php',
         api: __DIR__ . '/../routes/api.php',
         apiPrefix: 'api',
+        health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // CORS é tratado pelo HandleCors automático do Laravel
+        // API-only: remove sessão/CSRF do grupo web (evita 500 na rota /)
+        $middleware->web(remove: [
+            \Illuminate\Session\Middleware\StartSession::class,
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+        ]);
+
         $middleware->api(prepend: [
             \Illuminate\Http\Middleware\HandleCors::class,
         ]);
