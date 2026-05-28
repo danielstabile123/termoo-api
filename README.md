@@ -63,6 +63,22 @@ Valida uma tentativa do jogador.
 
 ---
 
+## Deploy no Railway
+
+1. Faça push deste repositório para o GitHub (já conectado ao Railway).
+2. No Railway, abra o serviço **termoo-api** → **Variables** e adicione:
+   - `APP_KEY` — gere no PC com `php artisan key:generate --show` (ou use qualquer chave `base64:...` de 32 bytes)
+   - `APP_ENV` = `production`
+   - `APP_DEBUG` = `false`
+   - `APP_URL` = URL pública do Railway (ex: `https://termoo-api-production.up.railway.app`)
+3. Em **Settings** → confirme que o **Root Directory** está vazio (raiz do repo).
+4. Clique em **Redeploy** (ou faça um novo commit).
+5. Teste: `POST https://SUA-URL.up.railway.app/api/iniciar-jogo`
+
+Se o build falhar de novo, abra a aba **Build Logs** e verifique se `composer install` terminou sem erro.
+
+---
+
 ## Instalação e Deploy
 
 ### Pré-requisitos

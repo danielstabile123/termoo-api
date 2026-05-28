@@ -3,9 +3,10 @@
     "description": "API REST para o jogo Termoo",
     "type": "project",
     "require": {
-        "php": "^8.1",
-        "laravel/framework": "^10.0",
-        "laravel/sanctum": "^3.2"
+        "php": "^8.2",
+        "laravel/framework": "^11.0",
+        "ext-mbstring": "*",
+        "ext-intl": "*",
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
@@ -14,9 +15,7 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "app/",
-            "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "App\\": "app/"
         }
     },
     "autoload-dev": {
