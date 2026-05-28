@@ -91,4 +91,44 @@ class TermooController extends Controller
 
         return response()->json($resultado, 200);
     }
+
+    /**
+     * POST /jogos/{idJogo}/tentativas
+     * Formato esperado pelo front do professor (termorest.conradosal.com).
+     */
+    public function validarTentativaProfessor(Request $request, string $idJogo): JsonResponse
+    {
+        $request->merge(['idJogo' => $idJogo]);
+
+        $validator = Validator::make($request->all(), [
+            'palavra' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['erro' => 'Requisição inválida.'], 400);
+        }
+
+        $jogo = $this->termooService->buscarJogo($idJogo);
+        if (! $jogo) {
+            return response()->json(['erro' => 'Jogo não encontrado.'], 404);
+        }
+
+        if ($jogo['venceu'] || $jogo['tentativasRestantes'] <= 0) {
+            return response()->json(['erro' => 'Este jogo já foi finalizado.'], 409);
+        }
+
+        $palavra = $this->termooService->normalizarPalavra($request->input('palavra'));
+
+        if (mb_strlen($palavra) !== $jogo['tamanhoPalavra']) {
+            return response()->json(['erro' => 'A palavra deve ter 5 letras.'], 400);
+        }
+
+        if (! $this->termooService->palavraExiste($palavra)) {
+            return response()->json(['erro' => 'Palavra não encontrada no dicionário.'], 400);
+        }
+
+        $resultado = $this->termooService->validarTentativa($idJogo, $palavra);
+
+        return response()->json($resultado, 200);
+    }
 }

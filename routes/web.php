@@ -1,8 +1,13 @@
 <?php
 
+use App\Http\Controllers\TermooController;
 use Illuminate\Support\Facades\Route;
 
-// A API não possui rotas web. Todas as rotas estão em routes/api.php
+// Página do jogo (HTML/CSS simples, estilo do professor)
 Route::get('/', function () {
-    return response()->json(['status' => 'Termoo API online']);
+    return redirect('/termo.html');
 });
+
+// Rotas usadas pelo front oficial do professor (termorest.conradosal.com)
+Route::post('/jogos', [TermooController::class, 'iniciarJogo']);
+Route::post('/jogos/{idJogo}/tentativas', [TermooController::class, 'validarTentativaProfessor']);

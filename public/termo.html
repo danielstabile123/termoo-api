@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termo REST - Atividade</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/termo.css">
+</head>
+<body>
+
+    <header class="cabecalho">
+        <h1>TERMO<span class="badge">REST</span></h1>
+        <span id="status">Desconectado</span>
+    </header>
+
+    <section class="config">
+        <input type="text" id="apiUrl" placeholder="https://sua-api.up.railway.app" value="">
+        <button type="button" onclick="conectar()">Conectar</button>
+    </section>
+
+    <div id="board"></div>
+
+    <div class="inputs">
+        <input type="text" maxlength="1" disabled>
+        <input type="text" maxlength="1" disabled>
+        <input type="text" maxlength="1" disabled>
+        <input type="text" maxlength="1" disabled>
+        <input type="text" maxlength="1" disabled>
+    </div>
+
+    <button type="button" id="btnEnviar" class="btn-enviar" onclick="enviarPalpite()" disabled>Enviar palpite</button>
+
+    <div id="teclado"></div>
+
+    <p class="mensagem">Atividade — Arquitetura Orientada a Serviços e WebServices (Unis)</p>
+
+    <div id="toast"></div>
+
+    <script src="js/termo.js"></script>
+</body>
+</html>

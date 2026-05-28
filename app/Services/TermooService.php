@@ -351,12 +351,18 @@ class TermooService
 
         $this->salvarEstado($idJogo, $jogo);
 
-        return [
+        $resposta = [
             'resultado'           => $resultado,
             'venceu'              => $venceu,
             'tentativasRestantes' => $jogo['tentativasRestantes'],
             'palavraValida'       => true,
         ];
+
+        if ($venceu || $jogo['tentativasRestantes'] <= 0) {
+            $resposta['palavraCorreta'] = $secreta;
+        }
+
+        return $resposta;
     }
 
     // -----------------------------------------------------------------------

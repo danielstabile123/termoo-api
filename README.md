@@ -171,6 +171,22 @@ curl -X POST https://sua-api.com/api/validar-tentativa \
 
 ---
 
+## Front-end (HTML, CSS e JavaScript)
+
+Versão **mais simples**, inspirada no site do professor, em arquivos separados (nível de disciplina):
+
+```
+public/
+├── termo.html      ← página do jogo
+├── css/termo.css   ← visual (azul/amarelo Unis, grade, teclado)
+└── js/termo.js     ← chama a API (/api/iniciar-jogo e /api/validar-tentativa)
+```
+
+- Abra: `https://SUA-URL.up.railway.app/termo.html` (ou só `/` que redireciona)
+- O site do professor (`termorest.conradosal.com`) também funciona: use a mesma URL da API e clique em **Conectar** (rotas `/jogos` incluídas)
+
+---
+
 ## Arquitetura
 
 ```
