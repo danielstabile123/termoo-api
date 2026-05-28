@@ -1,4 +1,4 @@
-// Front simples do Termoo — consome a API Laravel
+// Jogo Termoo — front simples
 
 let apiUrl = '';
 let idJogo = null;
@@ -11,8 +11,8 @@ const toast = document.getElementById('toast');
 
 function mostrarToast(msg, erro) {
     toast.textContent = msg;
-    toast.className = 'show' + (erro ? ' erro' : '');
-    setTimeout(() => toast.classList.remove('show'), 2500);
+    toast.className = erro ? 'show erro' : 'show';
+    setTimeout(() => { toast.className = ''; }, 2500);
 }
 
 function montarTabuleiro() {
@@ -28,34 +28,6 @@ function montarTabuleiro() {
             linha.appendChild(celula);
         }
         board.appendChild(linha);
-    }
-}
-
-function montarTeclado() {
-    const linhas = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
-    const teclado = document.getElementById('teclado');
-    teclado.innerHTML = '';
-
-    linhas.forEach((letras) => {
-        const div = document.createElement('div');
-        div.className = 'tecla-linha';
-        letras.split('').forEach((letra) => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'tecla';
-            btn.textContent = letra;
-            btn.onclick = () => digitarLetra(letra);
-            div.appendChild(btn);
-        });
-        teclado.appendChild(div);
-    });
-}
-
-function digitarLetra(letra) {
-    const vazio = Array.from(inputs).find((i) => !i.value);
-    if (vazio) {
-        vazio.value = letra;
-        vazio.focus();
     }
 }
 
@@ -86,7 +58,7 @@ async function conectar() {
             headers: { 'Content-Type': 'application/json' },
         });
 
-        if (!res.ok) throw new Error('HTTP ' + res.status);
+        if (!res.ok) throw new Error();
 
         const data = await res.json();
         idJogo = data.idJogo;
@@ -94,10 +66,10 @@ async function conectar() {
         montarTabuleiro();
         habilitarJogo(true);
         limparInputs();
-        mostrarToast('Jogo iniciado!');
+        mostrarToast('Jogo iniciado');
     } catch (e) {
         statusEl.textContent = 'Desconectado';
-        mostrarToast('Erro ao conectar na API', true);
+        mostrarToast('Erro ao conectar', true);
     }
 }
 
@@ -118,20 +90,20 @@ async function enviarPalpite() {
         const data = await res.json();
 
         if (!res.ok) {
-            mostrarToast(data.erro || 'Erro na tentativa', true);
+            const msg = data.erro || (data.detalhes && data.detalhes.join(' ')) || 'Erro';
+            mostrarToast(msg, true);
             return;
         }
 
         if (data.palavraValida === false) {
-            mostrarToast('Palavra não está no dicionário', true);
+            mostrarToast('Palavra não existe no dicionário', true);
             return;
         }
 
         for (let j = 0; j < 5; j++) {
             const celula = document.getElementById('c-' + linhaAtual + '-' + j);
-            const item = data.resultado[j];
-            celula.textContent = item.letra;
-            celula.classList.add(item.status);
+            celula.textContent = data.resultado[j].letra;
+            celula.classList.add(data.resultado[j].status);
         }
 
         linhaAtual++;
@@ -141,17 +113,25 @@ async function enviarPalpite() {
             mostrarToast('Você venceu!');
             habilitarJogo(false);
         } else if (data.tentativasRestantes === 0) {
-            mostrarToast('Suas tentativas acabaram', true);
+            mostrarToast('Tentativas acabaram', true);
             habilitarJogo(false);
         }
     } catch (e) {
-        mostrarToast('Erro ao enviar palpite', true);
+        mostrarToast('Erro ao enviar', true);
     }
 }
 
-// Se abrir no mesmo servidor da API, preenche a URL automaticamente
+// Enter envia palpite
+inputs.forEach((input, i) => {
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') enviarPalpite();
+        if (e.key === 'Backspace' && !input.value && i > 0) inputs[i - 1].focus();
+    });
+    input.addEventListener('input', () => {
+        if (input.value && i < inputs.length - 1) inputs[i + 1].focus();
+    });
+});
+
 if (window.location.origin && !window.location.origin.startsWith('file')) {
     document.getElementById('apiUrl').value = window.location.origin;
 }
-
-montarTeclado();

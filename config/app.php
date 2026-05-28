@@ -14,7 +14,7 @@ return [
 
     'locale' => 'pt_BR',
 
-    'fallback_locale' => 'en',
+    'fallback_locale' => 'pt_BR',
 
     'faker_locale' => 'pt_BR',
 

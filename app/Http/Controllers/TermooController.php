@@ -33,12 +33,17 @@ class TermooController extends Controller
         $validator = Validator::make($request->all(), [
             'idJogo'  => 'required|string',
             'palavra' => 'required|string',
+        ], [
+            'idJogo.required'  => 'Informe o id do jogo.',
+            'idJogo.string'    => 'O id do jogo deve ser um texto.',
+            'palavra.required' => 'Informe a palavra.',
+            'palavra.string'   => 'A palavra deve ser um texto.',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'erro' => 'Requisição inválida.',
-                'detalhes' => $validator->errors(),
+                'detalhes' => $validator->errors()->all(),
             ], 400);
         }
 
@@ -102,10 +107,16 @@ class TermooController extends Controller
 
         $validator = Validator::make($request->all(), [
             'palavra' => 'required|string',
+        ], [
+            'palavra.required' => 'Informe a palavra.',
+            'palavra.string'   => 'A palavra deve ser um texto.',
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['erro' => 'Requisição inválida.'], 400);
+            return response()->json([
+                'erro' => 'Requisição inválida.',
+                'detalhes' => $validator->errors()->all(),
+            ], 400);
         }
 
         $jogo = $this->termooService->buscarJogo($idJogo);

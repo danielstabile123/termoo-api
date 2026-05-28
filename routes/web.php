@@ -3,7 +3,7 @@
 use App\Http\Controllers\TermooController;
 use Illuminate\Support\Facades\Route;
 
-// Página do jogo (HTML/CSS simples, estilo do professor)
+// Páginas HTML simples
 Route::get('/', function () {
     return redirect('/termo.html');
 });

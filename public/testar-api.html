@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Testar API Termoo</title>
+    <link rel="stylesheet" href="css/testar-api.css">
+</head>
+<body>
+
+    <h1>Testar API</h1>
+    <p>Página simples para testar os endpoints (sem visual de jogo).</p>
+
+    <label for="baseUrl">URL base da API</label>
+    <input type="text" id="baseUrl" placeholder="https://sua-api.up.railway.app">
+
+    <div class="botoes-rapidos">
+        <button type="button" onclick="preencherIniciar()">Iniciar jogo</button>
+        <button type="button" onclick="preencherValidar()">Validar tentativa</button>
+    </div>
+
+    <label for="metodo">Método</label>
+    <select id="metodo">
+        <option value="POST">POST</option>
+        <option value="GET">GET</option>
+    </select>
+
+    <label for="url">URL completa</label>
+    <input type="text" id="url">
+
+    <label for="corpo">Corpo (JSON) — só para POST</label>
+    <textarea id="corpo" rows="8"></textarea>
+
+    <button type="button" onclick="enviar()">Enviar</button>
+
+    <h2>Resposta</h2>
+    <pre id="resposta">Aguardando...</pre>
+
+    <p><a href="termo.html">Ir para o jogo</a></p>
+
+    <script src="js/testar-api.js"></script>
+</body>
+</html>

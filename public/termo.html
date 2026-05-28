@@ -3,21 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Termo REST - Atividade</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <title>Termo REST</title>
     <link rel="stylesheet" href="css/termo.css">
 </head>
 <body>
 
-    <header class="cabecalho">
-        <h1>TERMO<span class="badge">REST</span></h1>
-        <span id="status">Desconectado</span>
-    </header>
+    <h1>Termo REST</h1>
+    <span id="status">Desconectado</span>
 
-    <section class="config">
-        <input type="text" id="apiUrl" placeholder="https://sua-api.up.railway.app" value="">
+    <div class="config">
+        <label for="apiUrl">URL da API</label>
+        <input type="text" id="apiUrl" placeholder="https://sua-api.up.railway.app">
         <button type="button" onclick="conectar()">Conectar</button>
-    </section>
+    </div>
 
     <div id="board"></div>
 
@@ -29,11 +27,11 @@
         <input type="text" maxlength="1" disabled>
     </div>
 
-    <button type="button" id="btnEnviar" class="btn-enviar" onclick="enviarPalpite()" disabled>Enviar palpite</button>
+    <button type="button" id="btnEnviar" class="btn-enviar" onclick="enviarPalpite()" disabled>
+        Enviar
+    </button>
 
-    <div id="teclado"></div>
-
-    <p class="mensagem">Atividade — Arquitetura Orientada a Serviços e WebServices (Unis)</p>
+    <p class="mensagem">Arquitetura Orientada a Serviços — Unis</p>
 
     <div id="toast"></div>
 
