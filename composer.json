@@ -6,7 +6,7 @@
         "php": "^8.2",
         "laravel/framework": "^11.0",
         "ext-mbstring": "*",
-        "ext-intl": "*",
+        "ext-intl": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
