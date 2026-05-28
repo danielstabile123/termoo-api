@@ -1,8 +1,12 @@
+# Configuração de build/deploy no Railway (Nixpacks)
+
 [phases.build]
 cmds = [
+    # Cria pastas de storage antes de subir
     "mkdir -p storage/app/games storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache",
     "chmod +x scripts/start.sh"
 ]
 
 [start]
+# Comando ao iniciar o container
 cmd = "bash scripts/start.sh"

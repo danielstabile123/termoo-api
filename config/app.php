@@ -1,5 +1,10 @@
 <?php
 
+/*
+| Configurações gerais da aplicação (nome, ambiente, idioma, chave).
+| Valores sensíveis vêm do .env no servidor (Railway → Variables).
+*/
+
 return [
 
     'name' => env('APP_NAME', 'TermooAPI'),
@@ -18,6 +23,7 @@ return [
 
     'faker_locale' => 'pt_BR',
 
+    // Chave de criptografia do Laravel (obrigatória em produção)
     'key' => env('APP_KEY'),
 
     'cipher' => 'AES-256-CBC',

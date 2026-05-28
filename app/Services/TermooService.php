@@ -4,15 +4,30 @@ namespace App\Services;
 
 use Illuminate\Support\Str;
 
+/**
+ * TermooService = "cérebro" do jogo.
+ *
+ * Responsabilidades:
+ * - Sortear palavra secreta de 5 letras
+ * - Guardar cada partida em arquivo JSON (storage/app/games/)
+ * - Validar se a palavra está no dicionário
+ * - Calcular correta / presente / ausente (igual Wordle/Termo)
+ */
 class TermooService
 {
+    /** Tamanho fixo da palavra no Termoo */
     private const TAMANHO_PALAVRA   = 5;
-    private const TENTATIVAS_MAX    = 6;
-    private const STORAGE_PATH      = 'games'; // dentro de storage/app/
 
-    // -----------------------------------------------------------------------
-    // Lista de palavras válidas
-    // -----------------------------------------------------------------------
+    /** Quantidade máxima de chutes por partida */
+    private const TENTATIVAS_MAX    = 6;
+
+    /** Pasta onde ficam os arquivos .json de cada jogo */
+    private const STORAGE_PATH      = 'games';
+
+    /**
+     * Dicionário: só palavras desta lista podem ser chutadas.
+     * (Lista longa omitida nos comentários — são centenas de palavras de 5 letras.)
+     */
     private array $palavras = [
         'sagaz', 'amago', 'termo', 'negro', 'exito', 'mexer', 'nobre', 'senso', 'etica', 'afeto',
         'algoz', 'fazer', 'plena', 'tenue', 'assim', 'sobre', 'mutua', 'aquem', 'poder', 'secao',
@@ -265,30 +280,29 @@ class TermooService
         'zorro', 'zunir',
     ];
 
-    // -----------------------------------------------------------------------
-    // Público
-    // -----------------------------------------------------------------------
-
     /**
-     * Inicia um novo jogo, sorteando uma palavra secreta, e persiste o estado.
+     * Inicia partida nova:
+     * 1) sorteia palavra secreta
+     * 2) gera id único (UUID)
+     * 3) salva estado no disco
+     * 4) devolve só o que o front pode ver (NUNCA envia a palavra secreta)
      */
     public function iniciarJogo(): array
     {
         $palavraSecreta = $this->sortearPalavra();
-        $idJogo         = (string) Str::uuid();
+        $idJogo         = (string) Str::uuid(); // ex: 550e8400-e29b-41d4-a716-446655440000
 
         $estado = [
             'idJogo'              => $idJogo,
             'tamanhoPalavra'      => self::TAMANHO_PALAVRA,
             'tentativasMaximas'   => self::TENTATIVAS_MAX,
             'tentativasRestantes' => self::TENTATIVAS_MAX,
-            'palavraSecreta'      => $palavraSecreta,
+            'palavraSecreta'      => $palavraSecreta, // fica só no servidor
             'venceu'              => false,
         ];
 
         $this->salvarEstado($idJogo, $estado);
 
-        // Retorna apenas o necessário para o frontend
         return [
             'idJogo'            => $idJogo,
             'tamanhoPalavra'    => self::TAMANHO_PALAVRA,
@@ -296,24 +310,21 @@ class TermooService
         ];
     }
 
-    /**
-     * Busca o estado persistido de um jogo pelo ID.
-     */
+    /** Lê o arquivo JSON da partida; retorna null se o id não existir */
     public function buscarJogo(string $idJogo): ?array
     {
         return $this->carregarEstado($idJogo);
     }
 
-    /**
-     * Verifica se a palavra existe no dicionário (já normalizada).
-     */
+    /** true se a palavra estiver na lista $palavras (já sem acento e minúscula) */
     public function palavraExiste(string $palavra): bool
     {
         return in_array($palavra, $this->palavras, true);
     }
 
     /**
-     * Remove acentos e normaliza a palavra para comparação interna.
+     * Padroniza texto: minúsculas + remove acentos.
+     * Assim "AÇÃO" e "acao" são tratados iguais na comparação.
      */
     public function normalizarPalavra(string $palavra): string
     {
@@ -333,7 +344,10 @@ class TermooService
     }
 
     /**
-     * Valida a tentativa, atualiza o estado e retorna o resultado.
+     * Processa um chute válido:
+     * - compara letra a letra
+     * - diminui tentativasRestantes
+     * - salva estado atualizado
      */
     public function validarTentativa(string $idJogo, string $palavra): array
     {
@@ -343,7 +357,7 @@ class TermooService
         $resultado = $this->calcularResultado($palavra, $secreta);
 
         $venceu = ($palavra === $secreta);
-        $jogo['tentativasRestantes']--;
+        $jogo['tentativasRestantes']--; // cada chute válido gasta 1 tentativa
 
         if ($venceu) {
             $jogo['venceu'] = true;
@@ -358,6 +372,7 @@ class TermooService
             'palavraValida'       => true,
         ];
 
+        // Front do professor usa isso para mostrar a palavra ao perder/ganhar
         if ($venceu || $jogo['tentativasRestantes'] <= 0) {
             $resposta['palavraCorreta'] = $secreta;
         }
@@ -365,13 +380,13 @@ class TermooService
         return $resposta;
     }
 
-    // -----------------------------------------------------------------------
-    // Privado — Lógica do Jogo
-    // -----------------------------------------------------------------------
-
     /**
-     * Algoritmo principal: compara letra a letra e retorna os status.
-     * Implementa a lógica correta para letras duplicadas (como no Wordle).
+     * Algoritmo das cores (2 passos, igual Termo/Wordle):
+     *
+     * Passo 1 — marca "correta" (letra certa no lugar certo)
+     * Passo 2 — nas sobras, marca "presente" (existe em outra posição) ou "ausente"
+     *
+     * O contador evita marcar "presente" a mais quando há letras repetidas.
      */
     private function calcularResultado(string $tentativa, string $secreta): array
     {
@@ -413,15 +428,13 @@ class TermooService
         return $resultado;
     }
 
+    /** Escolhe índice aleatório no array $palavras */
     private function sortearPalavra(): string
     {
         return $this->palavras[array_rand($this->palavras)];
     }
 
-    // -----------------------------------------------------------------------
-    // Privado — Persistência (arquivo JSON por partida)
-    // -----------------------------------------------------------------------
-
+    /** Monta caminho: storage/app/games/{idJogo}.json */
     private function caminhoArquivo(string $idJogo): string
     {
         $dir = storage_path('app/' . self::STORAGE_PATH);
@@ -432,6 +445,7 @@ class TermooService
         return $dir . '/' . $idJogo . '.json';
     }
 
+    /** Grava o estado da partida em JSON no disco */
     private function salvarEstado(string $idJogo, array $estado): void
     {
         file_put_contents(
@@ -440,6 +454,7 @@ class TermooService
         );
     }
 
+    /** Lê o JSON da partida; null se o arquivo não existir */
     private function carregarEstado(string $idJogo): ?array
     {
         $arquivo = $this->caminhoArquivo($idJogo);

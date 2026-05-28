@@ -1,5 +1,10 @@
 <?php
 
+/*
+| Sessão HTTP — pouco usada nesta API (sem login de usuário).
+| Mantido porque o Laravel espera este arquivo na configuração padrão.
+*/
+
 use Illuminate\Support\Str;
 
 return [

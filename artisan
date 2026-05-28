@@ -1,6 +1,11 @@
 #!/usr/bin/env php
 <?php
 
+/**
+ * CLI do Laravel — comandos no terminal (ex: php artisan config:clear).
+ * No Railway o servidor web usa index.php; artisan é auxiliar.
+ */
+
 use Symfony\Component\Console\Input\ArgvInput;
 
 define('LARAVEL_START', microtime(true));

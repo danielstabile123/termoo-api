@@ -1,24 +1,28 @@
 <?php
 
+/*
+|--------------------------------------------------------------------------
+| CORS — Cross-Origin Resource Sharing
+|--------------------------------------------------------------------------
+|
+| O front do professor (termorest.conradosal.com) roda em OUTRO domínio
+| que a nossa API (railway.app). Sem CORS, o navegador bloqueia o fetch.
+|
+| Este arquivo libera apenas o domínio do professor a chamar nossa API.
+|
+*/
+
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Cross-Origin Resource Sharing (CORS) Configuration
-    |--------------------------------------------------------------------------
-    |
-    | Libera o frontend do Termoo para acessar a API.
-    |
-    */
-
+    // Quais URLs da nossa API aceitam requisição cross-origin
     'paths' => ['api/*', 'jogos', 'jogos/*', 'sanctum/csrf-cookie'],
 
+    // GET, POST, etc.
     'allowed_methods' => ['*'],
 
+    // Só este site pode chamar a API a partir do navegador
     'allowed_origins' => [
         'https://termorest.conradosal.com',
-        // Adicione outros domínios se precisar testar localmente:
-        // 'http://localhost:3000',
     ],
 
     'allowed_origins_patterns' => [],

@@ -74,11 +74,9 @@ Valida uma tentativa do jogador.
    - `APP_KEY` = opcional — o script `scripts/start.sh` gera automaticamente se estiver vazio
 3. Em **Settings** → confirme que o **Root Directory** está vazio (raiz do repo).
 4. Clique em **Redeploy** (ou faça um novo commit).
-5. Teste:
-   - `GET https://SUA-URL.up.railway.app/` → status da API
-   - `POST https://SUA-URL.up.railway.app/api/iniciar-jogo` → inicia partida
+5. Teste em [termorest.conradosal.com](https://termorest.conradosal.com) — cole a URL da API e clique em **Conectar**.
 
-> **Importante:** o front do Termoo usa as rotas `/api/...`. A URL base é só `https://SUA-URL.up.railway.app` (sem `/api` no final).
+> **Importante:** a URL base é `https://SUA-URL.up.railway.app` (sem `/api` no final). Este projeto é só a API; o jogo visual fica no site do professor.
 
 Se o build falhar de novo, abra a aba **Build Logs** e verifique se `composer install` terminou sem erro.
 
@@ -171,22 +169,6 @@ curl -X POST https://sua-api.com/api/validar-tentativa \
 
 ---
 
-## Front-end (HTML, CSS e JavaScript)
-
-Versão **mais simples**, inspirada no site do professor, em arquivos separados (nível de disciplina):
-
-```
-public/
-├── termo.html      ← página do jogo
-├── css/termo.css   ← visual (azul/amarelo Unis, grade, teclado)
-└── js/termo.js     ← chama a API (/api/iniciar-jogo e /api/validar-tentativa)
-```
-
-- Abra: `https://SUA-URL.up.railway.app/termo.html` (ou só `/` que redireciona)
-- O site do professor (`termorest.conradosal.com`) também funciona: use a mesma URL da API e clique em **Conectar** (rotas `/jogos` incluídas)
-
----
-
 ## Arquitetura
 
 ```
@@ -199,7 +181,8 @@ app/
 config/
 └── cors.php                        ← CORS liberado para termorest.conradosal.com
 routes/
-└── api.php                         ← POST /iniciar-jogo, POST /validar-tentativa
+├── api.php                         ← POST /api/iniciar-jogo, POST /api/validar-tentativa
+└── web.php                         ← POST /jogos (front do professor), GET / status
 storage/app/games/                  ← Estados das partidas (JSON por arquivo)
 ```
 

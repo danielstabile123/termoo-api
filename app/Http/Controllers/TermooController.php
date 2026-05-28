@@ -7,29 +7,48 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
+/**
+ * Controller = "porteiro" da API.
+ *
+ * Recebe as requisições HTTP do front (site do professor ou Postman),
+ * valida os dados enviados e repassa a lógica do jogo para o TermooService.
+ *
+ * Não contém a regra do jogo em si — só organiza entrada e saída (JSON + código HTTP).
+ */
 class TermooController extends Controller
 {
+    /**
+     * Injeta o TermooService automaticamente (Laravel cria a instância).
+     */
     public function __construct(private TermooService $termooService)
     {
     }
 
     /**
      * POST /api/iniciar-jogo
-     * Inicia uma nova partida do Termoo e retorna o ID do jogo.
+     *
+     * Chamado quando o jogador começa uma partida nova.
+     * Sorteia a palavra secreta, salva o jogo e devolve o idJogo para as próximas tentativas.
      */
     public function iniciarJogo(Request $request): JsonResponse
     {
         $jogo = $this->termooService->iniciarJogo();
 
+        // 200 = sucesso; corpo em JSON
         return response()->json($jogo, 200);
     }
 
     /**
      * POST /api/validar-tentativa
-     * Valida a tentativa do jogador e retorna o resultado letra a letra.
+     *
+     * Body esperado: { "idJogo": "...", "palavra": "carro" }
+     *
+     * Compara a palavra chutada com a secreta e retorna correta/presente/ausente por letra.
+     * Este endpoint segue o enunciado da disciplina (/api/...).
      */
     public function validarTentativa(Request $request): JsonResponse
     {
+        // Valida se os campos obrigatórios vieram no JSON
         $validator = Validator::make($request->all(), [
             'idJogo'  => 'required|string',
             'palavra' => 'required|string',
@@ -44,27 +63,27 @@ class TermooController extends Controller
             return response()->json([
                 'erro' => 'Requisição inválida.',
                 'detalhes' => $validator->errors()->all(),
-            ], 400);
+            ], 400); // 400 = erro do cliente (dados faltando)
         }
 
         $idJogo  = $request->input('idJogo');
         $palavra = $request->input('palavra');
 
-        // Verifica se o jogo existe
+        // Carrega a partida salva no servidor (arquivo JSON)
         $jogo = $this->termooService->buscarJogo($idJogo);
         if (! $jogo) {
             return response()->json([
                 'erro' => 'Jogo não encontrado.',
-            ], 404);
+            ], 404); // 404 = idJogo não existe
         }
 
-        // Validações de negócio — 400 Bad Request
         $tamanho = $jogo['tamanhoPalavra'];
+        // Minúsculas e sem acento para comparar (ex: "ÇÃO" vira "cao")
         $palavraNormalizada = $this->termooService->normalizarPalavra($palavra);
 
         if (mb_strlen($palavraNormalizada) !== $tamanho) {
             return response()->json([
-                'erro'         => "A palavra deve ter {$tamanho} letras.",
+                'erro'          => "A palavra deve ter {$tamanho} letras.",
                 'palavraValida' => false,
             ], 400);
         }
@@ -81,17 +100,18 @@ class TermooController extends Controller
             ], 400);
         }
 
-        // Verifica se a palavra está no dicionário
+        // Palavra precisa existir no dicionário (regra do Termoo)
         if (! $this->termooService->palavraExiste($palavraNormalizada)) {
+            // Enunciado pede 200 com palavraValida: false (não gasta tentativa)
             return response()->json([
-                'resultado'          => [],
-                'venceu'             => false,
+                'resultado'           => [],
+                'venceu'              => false,
                 'tentativasRestantes' => $jogo['tentativasRestantes'],
                 'palavraValida'       => false,
             ], 200);
         }
 
-        // Processa a tentativa
+        // Tudo certo: processa o chute e pinta as letras
         $resultado = $this->termooService->validarTentativa($idJogo, $palavraNormalizada);
 
         return response()->json($resultado, 200);
@@ -99,7 +119,10 @@ class TermooController extends Controller
 
     /**
      * POST /jogos/{idJogo}/tentativas
-     * Formato esperado pelo front do professor (termorest.conradosal.com).
+     *
+     * Mesma lógica do validar-tentativa, mas no formato que o site do professor usa:
+     * - idJogo vem na URL, não no body
+     * - palavra inválida no dicionário retorna 400 (não 200)
      */
     public function validarTentativaProfessor(Request $request, string $idJogo): JsonResponse
     {

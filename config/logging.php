@@ -1,8 +1,12 @@
 <?php
 
+/*
+| Configuração de logs (erros e depuração).
+| No Railway, LOG_CHANNEL=stderr envia logs para o painel do deploy.
+*/
+
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
-use Monolog\Handler\SyslogUdpHandler;
 use Monolog\Processor\PsrLogMessageProcessor;
 
 return [
